@@ -25,6 +25,10 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
+# При запуске через bash <(curl ...) stdin занят pipe-ом.
+# Переключаем stdin на терминал чтобы read работал корректно.
+exec < /dev/tty
+
 # ─── Проверка ОС ────────────────────────────────────────────────────────────
 if [[ -f /etc/os-release ]]; then
     . /etc/os-release
