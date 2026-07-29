@@ -67,13 +67,9 @@ ss -ntpl
 
 ---
 
-# 🌐 WARP Proxy Setup (FL-сервер)
+# 🌐 WARP Proxy Setup
 
-Настройка Cloudflare WARP в режиме локального SOCKS5-прокси для схемы:
-
-```
-Client → RU → FL (этот сервер) → WARP → Internet
-```
+Настройка Cloudflare WARP в режиме локального SOCKS5-прокси.
 
 ## ⚡ Быстрая установка
 
@@ -81,7 +77,7 @@ Client → RU → FL (этот сервер) → WARP → Internet
 bash <(curl -sL https://raw.githubusercontent.com/V2P-Dev/vps-customization/main/warp-setup.sh)
 ```
 
-> Запускать от **root** на FL-сервере (том, что смотрит в интернет через WARP).
+> Запускать от **root** на сервере.
 
 ## 📋 Что делает `warp-setup.sh`
 
@@ -98,7 +94,7 @@ bash <(curl -sL https://raw.githubusercontent.com/V2P-Dev/vps-customization/main
 
 ## 🔌 Использование с 3x-ui / Xray
 
-После успешной настройки в конфиге Xray (на FL-сервере) добавьте outbound:
+После успешной настройки в конфиге Xray добавьте outbound:
 
 ```json
 {
