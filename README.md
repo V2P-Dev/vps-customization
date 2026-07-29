@@ -65,6 +65,64 @@ ufw status verbose
 ss -ntpl
 ```
 
+---
+
+# 🌐 WARP Proxy Setup (FL-сервер)
+
+Настройка Cloudflare WARP в режиме локального SOCKS5-прокси для схемы:
+
+```
+Client → RU → FL (этот сервер) → WARP → Internet
+```
+
+## ⚡ Быстрая установка
+
+```bash
+bash <(curl -sL https://raw.githubusercontent.com/V2P-Dev/vps-customization/main/warp-setup.sh)
+```
+
+> Запускать от **root** на FL-сервере (том, что смотрит в интернет через WARP).
+
+## 📋 Что делает `warp-setup.sh`
+
+| Шаг | Действие |
+|-----|----------|
+| 1 | Установка `cloudflare-warp` из официального репозитория |
+| 2 | Регистрация клиента (`warp-cli registration new`) |
+| 3 | Режим `proxy`, порт настраивается (по умолчанию `40000`) |
+| 4 | Подключение и проверка статуса (`Connected`) + проверка `ss -lntp` |
+| 5 | `systemd` override `Restart=always` для `warp-svc` (автоперезапуск при падении) |
+| 6 | Проверка реального выхода в интернет через WARP (`cdn-cgi/trace`, ждём `warp=on`) |
+
+Скрипт идемпотентный: повторный запуск не ломает существующую установку — проверяет текущее состояние перед каждым шагом.
+
+## 🔌 Использование с 3x-ui / Xray
+
+После успешной настройки в конфиге Xray (на FL-сервере) добавьте outbound:
+
+```json
+{
+  "protocol": "socks",
+  "settings": {
+    "servers": [{ "address": "127.0.0.1", "port": 40000 }]
+  },
+  "tag": "warp-out"
+}
+```
+
+и направьте нужный routing-rule на `warp-out`.
+
+## 🛠 Диагностика
+
+```bash
+warp-cli status                 # статус подключения
+ss -lntp | grep 40000           # прокси слушает локально
+journalctl -u warp-svc -f       # логи демона
+curl --socks5-hostname 127.0.0.1:40000 https://www.cloudflare.com/cdn-cgi/trace
+```
+
+Если `warp-svc` падает — override `/etc/systemd/system/warp-svc.service.d/override.conf` с `Restart=always` перезапускает демон автоматически через 10 секунд.
+
 ## 📄 Лицензия
 
 MIT
